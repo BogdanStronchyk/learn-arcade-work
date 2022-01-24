@@ -31,7 +31,7 @@ arcade.draw_circle_outline(400, 250, 90, arcade.color.BLACK, 5)
 # Arms
 arcade.draw_line(550, 300, 250, 420, arcade.color.DEEP_COFFEE, 10)
 
-# Middle ball outlined
+# Middle ball outline
 arcade.draw_circle_filled(400, 350, 70, arcade.color.WHITE)
 arcade.draw_circle_outline(400, 350, 70, arcade.color.BLACK, 5)
 
