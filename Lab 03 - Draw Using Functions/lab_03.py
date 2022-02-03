@@ -186,7 +186,7 @@ def main():
     # Multiplying snowmen
     snowmen = no_intersect(30, 20, window_width - 30, 50, window_height / 3, 30, 50)
     for x, y in snowmen:
-        snowman(x, y, 20,  arcade.color.WHITE)
+        snowman(x, y, 21,  arcade.color.WHITE)
 
     # --- Finish drawing ---
     arcade.finish_render()
