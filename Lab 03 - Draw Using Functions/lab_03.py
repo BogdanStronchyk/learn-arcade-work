@@ -181,7 +181,7 @@ def main():
     arcade.draw_lrtb_rectangle_filled(0, window_width, window_height / 3, 0, arcade.color.WHITE)
 
     # placing moon
-    moon(1700, 900, 100, 15, 7, 20)
+    moon(int(window_width * 0.8), int(window_height * 0.8), 100, 15, 7, 20)
 
     # Multiplying snowmen
     snowmen = no_intersect(30, 20, window_width - 30, 50, window_height / 3, 30, 50)
