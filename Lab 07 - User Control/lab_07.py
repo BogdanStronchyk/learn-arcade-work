@@ -4,8 +4,10 @@ import arcade
 import random as rand
 
 # --- Constants ---
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1920
+SCREEN_HEIGHT = 1080
+coords_empty = []
+moon_size = 100
 
 
 def no_intersect(num, x_coord_min, x_coord_max, y_coord_min, y_coord_max, dist_min, dist_max):
@@ -34,10 +36,43 @@ def no_intersect(num, x_coord_min, x_coord_max, y_coord_min, y_coord_max, dist_m
     return set_coords
 
 
+stars_coords = no_intersect(338, 1, SCREEN_WIDTH, int(SCREEN_HEIGHT / 3), SCREEN_HEIGHT, 10, 30)
+
+
+def place_craters(crater_coordinates, craters, size, size_min, size_max):
+    while len(crater_coordinates) <= craters:  # пока кратеров менее craters
+        if len(crater_coordinates) == craters:
+            break
+
+        if len(crater_coordinates) < 1:  # первый кратер
+            crater_coordinates.append([rand.randint(-int(size * 0.6), int(size * 0.6)),
+                                       rand.randint(-int(size * 0.6), int(size * 0.6)),
+                                       rand.randint(size_min, size_max)])
+
+        x_t = rand.randint(-int(size * 0.6), int(size * 0.6))  # случайные координаты след кратера
+        y_t = rand.randint(-int(size * 0.6), int(size * 0.6))
+        s_t = rand.randint(size_min, size_max)  # случайный размер след кратера
+
+        cond = True  # есть ли место для кратера?
+        for c_x, c_y, c_size in crater_coordinates:
+            a = int((((c_x-x_t)**2) + ((c_y-y_t)**2))**0.5)  # расстояние между ц. старого и нового кратеров
+            b = int(c_size/2 + s_t/2 + rand.randint(15, 30))  # минимальное расстояние между ц. кратеров
+            if a <= b and a != 0:  # если негде делать новый кратер и он не совпадает со старым центрами
+                cond = False  # мест нет
+                break
+        if [x_t, y_t, s_t] not in crater_coordinates \
+                and cond is True:  # если этих координат в списке нет и есть место
+            crater_coordinates.append([x_t, y_t, s_t])  # добавить кратер
+    return crater_coordinates
+
+
+crater_coords = place_craters(coords_empty, 15, moon_size, 7, 15)
+
+
 class Stars:
     def __init__(self, num):
-        self.num = num * (SCREEN_WIDTH / SCREEN_HEIGHT)
-        self.stars_coords = no_intersect(self.num, 1, SCREEN_WIDTH, int(SCREEN_HEIGHT / 3), SCREEN_HEIGHT, 10, 30)
+        self.num = int(num * (SCREEN_WIDTH / SCREEN_HEIGHT))
+        self.stars_coords = stars_coords
 
     def draw(self):
         for star in self.stars_coords:
@@ -46,39 +81,12 @@ class Stars:
 
 
 class Moon:
-    def __init__(self, x, y, size, craters, size_min, size_max):
+    def __init__(self, x, y, size, craters):
         self.x = x
         self.y = y
         self.size = size
-        self.craters = craters
-        self.size_min = size_min
-        self.size_max = size_max
-        self.crater_coords = []
+        self.crater_coords = craters
 
-        while len(self.crater_coords) <= self.craters:  # пока кратеров менее craters
-            if len(self.crater_coords) == self.craters:
-                break
-
-            if len(self.crater_coords) < 1:  # первый кратер
-                self.crater_coords.append([rand.randint(-int(self.size * 0.6), int(self.size * 0.6)),
-                                    rand.randint(-int(self.size * 0.6), int(self.size * 0.6)),
-                                    rand.randint(self.size_min, self.size_max)])
-
-            x_t = rand.randint(-int(self.size * 0.6), int(self.size * 0.6))  # случайные координаты след кратера
-            y_t = rand.randint(-int(self.size * 0.6), int(self.size * 0.6))
-            s_t = rand.randint(self.size_min, self.size_max)  # случайный размер след кратера
-
-            cond = True  # есть ли место для кратера?
-            for c_x, c_y, c_size in self.crater_coords:
-                a = int(
-                    (((c_x - x_t) ** 2) + ((c_y - y_t) ** 2)) ** 0.5)  # расстояние между ц. старого и нового кратеров
-                b = int(c_size / 2 + s_t / 2 + rand.randint(15, 30))  # минимальное расстояние между ц. кратеров
-                if a <= b and a != 0:  # если негде делать новый кратер и он не совпадает со старым центрами
-                    cond = False  # мест нет
-                    break
-            if [x_t, y_t, s_t] not in self.crater_coords \
-                    and cond is True:  # если этих координат в списке нет и есть место
-                self.crater_coords.append([x_t, y_t, s_t])  # добавить кратер
 
     def draw(self):
         # defining the moon disk
@@ -219,8 +227,8 @@ class MyGame(arcade.Window):
 
         # Call the parent class initializer
         super().__init__(width, height, title)
-        self.stars = Stars(338)
-        self.moon = Moon(int(SCREEN_WIDTH * 0.8), int(SCREEN_HEIGHT * 0.8), 100, 15, 7, 15)
+        self.stars = Stars(480)
+        self.moon = Moon(int(SCREEN_WIDTH * 0.8), int(SCREEN_HEIGHT * 0.8), moon_size, crater_coords)
         self.snowman = Snowman(50, 50, 0, 0, 80, arcade.color.WHITE, 3)
 
     def on_draw(self):
