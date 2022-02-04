@@ -54,6 +54,7 @@ class Moon:
         self.size_min = size_min
         self.size_max = size_max
         self.crater_coords = []
+
         while len(self.crater_coords) <= self.craters:  # пока кратеров менее craters
             if len(self.crater_coords) == self.craters:
                 break
@@ -219,7 +220,7 @@ class MyGame(arcade.Window):
         # Call the parent class initializer
         super().__init__(width, height, title)
         self.stars = Stars(338)
-        self.moon = Moon(int(SCREEN_WIDTH * 0.8), int(SCREEN_HEIGHT * 0.8), 100, 15, 7, 20)
+        self.moon = Moon(int(SCREEN_WIDTH * 0.8), int(SCREEN_HEIGHT * 0.8), 100, 15, 7, 15)
         self.snowman = Snowman(50, 50, 0, 0, 80, arcade.color.WHITE, 3)
 
     def on_draw(self):
