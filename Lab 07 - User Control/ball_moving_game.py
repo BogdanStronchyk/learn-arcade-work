@@ -28,6 +28,7 @@ class Ball:
         # Move the ball
         self.position_y += self.change_y
         self.position_x += self.change_x
+
         # See if the ball hit the edge of the screen. If so, change direction
         if self.position_x < self.radius:
             self.position_x = self.radius
@@ -49,6 +50,10 @@ class MyGame(arcade.Window):
         # Call the parent class's init function
         super().__init__(width, height, title)
 
+        # Make the mouse disappear when it is over the window.
+        # So we just see our object, not the pointer.
+        self.set_mouse_visible(False)
+
         arcade.set_background_color(arcade.color.ASH_GREY)
 
         # Create our ball
@@ -59,15 +64,8 @@ class MyGame(arcade.Window):
         arcade.start_render()
         self.ball.draw()
 
-    # def on_mouse_motion(self, x, y, dx, dy):
-    #     self.ball.position_x = x
-    #     self.ball.position_y = y
-    #
-    # def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
-    #     if button == arcade.MOUSE_BUTTON_LEFT:
-    #         print("Left mouse button pressed at", x, y)
-    #     elif button == arcade.MOUSE_BUTTON_RIGHT:
-    #         print("Right mouse button pressed at", x, y)
+    def on_update(self, delta_time):
+        self.ball.update()
 
     def on_key_press(self, key, modifiers):
         """ Called whenever the user presses a key. """
