@@ -118,10 +118,10 @@ def no_intersect(num, x_coord_min, x_coord_max, y_coord_min, y_coord_max, dist_m
 
 
 # Draw the moon function
-def moon(x, y, craters, size_min, size_max):
+def moon(x, y, size, craters, size_min, size_max):
 
     # defining the moon disk
-    arcade.draw_circle_filled(x, y, 100, arcade.color.GRAY)
+    arcade.draw_circle_filled(x, y, size, arcade.color.GRAY)
 
     crater_coords = []
     while len(crater_coords) <= craters:  # пока кратеров менее craters
@@ -129,12 +129,12 @@ def moon(x, y, craters, size_min, size_max):
             break
 
         if len(crater_coords) < 1:  # первый кратер
-            crater_coords.append([rand.randint(-60, 60),
-                                  rand.randint(-60, 60),
+            crater_coords.append([rand.randint(-int(size * 0.6), int(size * 0.6)),
+                                  rand.randint(-int(size * 0.6), int(size * 0.6)),
                                   rand.randint(size_min, size_max)])
 
-        x_t = rand.randint(-60, 60)  # случайные координаты след кратера
-        y_t = rand.randint(-60, 60)
+        x_t = rand.randint(-int(size * 0.6), int(size * 0.6))  # случайные координаты след кратера
+        y_t = rand.randint(-int(size * 0.6), int(size * 0.6))
         s_t = rand.randint(size_min, size_max)  # случайный размер след кратера
 
         cond = True  # есть ли место для кратера?
@@ -181,7 +181,7 @@ def main():
     arcade.draw_lrtb_rectangle_filled(0, window_width, window_height / 3, 0, arcade.color.WHITE)
 
     # placing moon
-    moon(1700, 900, 15, 7, 20)
+    moon(1700, 900, 100, 15, 7, 20)
 
     # Multiplying snowmen
     snowmen = no_intersect(30, 20, window_width - 30, 50, window_height / 3, 30, 50)
