@@ -4,10 +4,10 @@ import arcade
 import random as rand
 
 # --- Constants ---
-SCREEN_WIDTH = 1920
-SCREEN_HEIGHT = 1080
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 coords_empty = []
-moon_size = 100
+moon_size = int(100/(SCREEN_WIDTH/SCREEN_HEIGHT))
 
 
 def no_intersect(num, x_coord_min, x_coord_max, y_coord_min, y_coord_max, dist_min, dist_max):
@@ -36,7 +36,7 @@ def no_intersect(num, x_coord_min, x_coord_max, y_coord_min, y_coord_max, dist_m
     return set_coords
 
 
-stars_coords = no_intersect(338, 1, SCREEN_WIDTH, int(SCREEN_HEIGHT / 3), SCREEN_HEIGHT, 10, 30)
+stars_coords = no_intersect(200, 1, SCREEN_WIDTH, int(SCREEN_HEIGHT / 3), SCREEN_HEIGHT, 10, 30)
 
 
 def place_craters(crater_coordinates, craters, size, size_min, size_max):
@@ -259,9 +259,9 @@ class MyGame(arcade.Window):
 
         # Call the parent class initializer
         super().__init__(width, height, title)
-        self.stars = Stars(480)
+        self.stars = Stars(338)
         self.moon = Moon(int(SCREEN_WIDTH * 0.8), int(SCREEN_HEIGHT * 0.8), moon_size, crater_coords)
-        self.snowman = Snowman(50, 50, 0, 0, 80, arcade.color.WHITE, 3)
+        self.snowman = Snowman(50, 50, 0, 0, 40, arcade.color.WHITE, 3)
 
     def on_draw(self):
         """Draw a background."""
