@@ -267,8 +267,8 @@ class MyGame(arcade.Window):
         """Draw a background."""
         arcade.set_background_color(arcade.color.DARK_BLUE)
         arcade.start_render()
-        arcade.draw_lrtb_rectangle_filled(0, SCREEN_WIDTH, SCREEN_HEIGHT / 3, 0, arcade.color.WHITE)
         self.stars.draw()
+        arcade.draw_lrtb_rectangle_filled(0, SCREEN_WIDTH, SCREEN_HEIGHT / 3, 0, arcade.color.WHITE)
         self.moon.draw()
         self.snowman.draw()
 
