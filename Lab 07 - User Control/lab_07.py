@@ -87,7 +87,6 @@ class Moon:
         self.size = size
         self.crater_coords = craters
 
-
     def draw(self):
         # defining the moon disk
         arcade.draw_circle_filled(self.x, self.y, self.size, arcade.color.GRAY)
@@ -114,90 +113,123 @@ class Snowman:
 
         # Lower ball outlined
         arcade.draw_circle_filled(self.position_x, self.position_y, int(90 / 100 * self.scale), arcade.color.WHITE)
-        arcade.draw_circle_outline(self.position_x, self.position_y, int(90 / 100 * self.scale), arcade.color.BLACK, int(5 / 100 * self.scale))
+        arcade.draw_circle_outline(self.position_x, self.position_y, int(90 / 100 * self.scale), arcade.color.BLACK,
+                                   int(5 / 100 * self.scale))
 
         # Arms
         arcade.draw_line(self.position_x + int(150 / 100 * self.scale), self.position_y + int(50 / 100 * self.scale),
-                         self.position_x - int(150 / 100 * self.scale), self.position_y + int(170 / 100 * self.scale), arcade.color.DEEP_COFFEE,
+                         self.position_x - int(150 / 100 * self.scale), self.position_y + int(170 / 100 * self.scale),
+                         arcade.color.DEEP_COFFEE,
                          int(10 / 100 * self.scale))
 
         # Middle ball outline
-        arcade.draw_circle_filled(self.position_x, self.position_y + int(100 / 100 * self.scale), int(70 / 100 * self.scale), arcade.color.WHITE)
-        arcade.draw_circle_outline(self.position_x, self.position_y + int(100 / 100 * self.scale), int(70 / 100 * self.scale), arcade.color.BLACK,
+        arcade.draw_circle_filled(self.position_x, self.position_y + int(100 / 100 * self.scale),
+                                  int(70 / 100 * self.scale), arcade.color.WHITE)
+        arcade.draw_circle_outline(self.position_x, self.position_y + int(100 / 100 * self.scale),
+                                   int(70 / 100 * self.scale), arcade.color.BLACK,
                                    int(5 / 100 * self.scale))
 
         # Upper ball outlined
-        arcade.draw_circle_filled(self.position_x, self.position_y + int(170 / 100 * self.scale), int(50 / 100 * self.scale), arcade.color.WHITE)
-        arcade.draw_circle_outline(self.position_x, self.position_y + int(170 / 100 * self.scale), int(50 / 100 * self.scale),
+        arcade.draw_circle_filled(self.position_x, self.position_y + int(170 / 100 * self.scale),
+                                  int(50 / 100 * self.scale), arcade.color.WHITE)
+        arcade.draw_circle_outline(self.position_x, self.position_y + int(170 / 100 * self.scale),
+                                   int(50 / 100 * self.scale),
                                    arcade.color.BLACK, int(5 / 100 * self.scale))
 
         # Bucket
-        arcade.draw_polygon_filled([[self.position_x - int(30 / 100 * self.scale), self.position_y + int(210 / 100 * self.scale)],
-                                    [self.position_x + int(45 / 100 * self.scale), self.position_y + int(190 / 100 * self.scale)],
-                                    [self.position_x + int(45 / 100 * self.scale), self.position_y + int(270 / 100 * self.scale)],
+        arcade.draw_polygon_filled([[self.position_x - int(30 / 100 * self.scale),
+                                     self.position_y + int(210 / 100 * self.scale)],
+                                    [self.position_x + int(45 / 100 * self.scale),
+                                     self.position_y + int(190 / 100 * self.scale)],
+                                    [self.position_x + int(45 / 100 * self.scale),
+                                     self.position_y + int(270 / 100 * self.scale)],
                                     [self.position_x, self.position_y + int(280 / 100 * self.scale)]],
                                    arcade.color.GRAY)
-        arcade.draw_polygon_outline([[self.position_x - int(30 / 100 * self.scale), self.position_y + int(210 / 100 * self.scale)],
-                                     [self.position_x + int(45 / 100 * self.scale), self.position_y + int(190 / 100 * self.scale)],
-                                     [self.position_x + int(45 / 100 * self.scale), self.position_y + int(270 / 100 * self.scale)],
+
+        arcade.draw_polygon_outline([[self.position_x - int(30 / 100 * self.scale),
+                                      self.position_y + int(210 / 100 * self.scale)],
+                                     [self.position_x + int(45 / 100 * self.scale),
+                                      self.position_y + int(190 / 100 * self.scale)],
+                                     [self.position_x + int(45 / 100 * self.scale),
+                                      self.position_y + int(270 / 100 * self.scale)],
                                      [self.position_x, self.position_y + int(280 / 100 * self.scale)]],
                                     arcade.color.BLACK, int(4 / 100 * self.scale))
 
         # Eyes
-        arcade.draw_circle_filled(self.position_x - int(20 / 100 * self.scale), self.position_y + int(190 / 100 * self.scale), int(5 / 100 * self.scale),
+        arcade.draw_circle_filled(self.position_x - int(20 / 100 * self.scale),
+                                  self.position_y + int(190 / 100 * self.scale), int(5 / 100 * self.scale),
                                   arcade.color.BLACK)
-        arcade.draw_circle_filled(self.position_x + int(20 / 100 * self.scale), self.position_y + int(190 / 100 * self.scale), int(5 / 100 * self.scale),
+        arcade.draw_circle_filled(self.position_x + int(20 / 100 * self.scale),
+                                  self.position_y + int(190 / 100 * self.scale), int(5 / 100 * self.scale),
                                   arcade.color.BLACK)
 
         # Nose
         arcade.draw_triangle_filled(self.position_x, self.position_y + int(160 / 100 * self.scale),
                                     self.position_x, self.position_y + int(180 / 100 * self.scale),
-                                    self.position_x - int(80 / 100 * self.scale), self.position_y + int(170 / 100 * self.scale), arcade.color.ORANGE)
+                                    self.position_x - int(80 / 100 * self.scale),
+                                    self.position_y + int(170 / 100 * self.scale), arcade.color.ORANGE)
 
         # Mouth
-        arcade.draw_circle_filled(self.position_x, self.position_y + int(140 / 100 * self.scale), int(5 / 100 * self.scale), arcade.color.BLACK)
-        arcade.draw_circle_filled(self.position_x - int(15 / 100 * self.scale), self.position_y + int(145 / 100 * self.scale), int(5 / 100 * self.scale),
+        arcade.draw_circle_filled(self.position_x, self.position_y + int(140 / 100 * self.scale),
+                                  int(5 / 100 * self.scale), arcade.color.BLACK)
+        arcade.draw_circle_filled(self.position_x - int(15 / 100 * self.scale),
+                                  self.position_y + int(145 / 100 * self.scale), int(5 / 100 * self.scale),
                                   arcade.color.BLACK)
-        arcade.draw_circle_filled(self.position_x + int(15 / 100 * self.scale), self.position_y + int(145 / 100 * self.scale), int(5 / 100 * self.scale),
+        arcade.draw_circle_filled(self.position_x + int(15 / 100 * self.scale),
+                                  self.position_y + int(145 / 100 * self.scale), int(5 / 100 * self.scale),
                                   arcade.color.BLACK)
-        arcade.draw_circle_filled(self.position_x - int(25 / 100 * self.scale), self.position_y + int(157 / 100 * self.scale), int(5 / 100 * self.scale),
+        arcade.draw_circle_filled(self.position_x - int(25 / 100 * self.scale),
+                                  self.position_y + int(157 / 100 * self.scale), int(5 / 100 * self.scale),
                                   arcade.color.BLACK)
-        arcade.draw_circle_filled(self.position_x + int(25 / 100 * self.scale), self.position_y + int(157 / 100 * self.scale), int(5 / 100 * self.scale),
+        arcade.draw_circle_filled(self.position_x + int(25 / 100 * self.scale),
+                                  self.position_y + int(157 / 100 * self.scale), int(5 / 100 * self.scale),
                                   arcade.color.BLACK)
 
         # Buttons
-        arcade.draw_circle_filled(self.position_x, self.position_y + int(105 / 100 * self.scale), int(8 / 100 * self.scale), arcade.color.BLACK)
-        arcade.draw_circle_filled(self.position_x, self.position_y + int(75 / 100 * self.scale), int(8 / 100 * self.scale), arcade.color.BLACK)
-        arcade.draw_circle_filled(self.position_x, self.position_y + int(45 / 100 * self.scale), int(8 / 100 * self.scale), arcade.color.BLACK)
-        arcade.draw_circle_filled(self.position_x, self.position_y + int(15 / 100 * self.scale), int(8 / 100 * self.scale), arcade.color.BLACK)
-        arcade.draw_circle_filled(self.position_x, self.position_y - int(15 / 100 * self.scale), int(8 / 100 * self.scale), arcade.color.BLACK)
+        arcade.draw_circle_filled(self.position_x, self.position_y + int(105 / 100 * self.scale),
+                                  int(8 / 100 * self.scale), arcade.color.BLACK)
+        arcade.draw_circle_filled(self.position_x, self.position_y + int(75 / 100 * self.scale),
+                                  int(8 / 100 * self.scale), arcade.color.BLACK)
+        arcade.draw_circle_filled(self.position_x, self.position_y + int(45 / 100 * self.scale),
+                                  int(8 / 100 * self.scale), arcade.color.BLACK)
+        arcade.draw_circle_filled(self.position_x, self.position_y + int(15 / 100 * self.scale),
+                                  int(8 / 100 * self.scale), arcade.color.BLACK)
+        arcade.draw_circle_filled(self.position_x, self.position_y - int(15 / 100 * self.scale),
+                                  int(8 / 100 * self.scale), arcade.color.BLACK)
 
         # Legs
-        arcade.draw_circle_filled(self.position_x - int(70 / 100 * self.scale), self.position_y - int(90 / 100 * self.scale), int(40 / 100 * self.scale),
+        arcade.draw_circle_filled(self.position_x - int(70 / 100 * self.scale),
+                                  self.position_y - int(90 / 100 * self.scale), int(40 / 100 * self.scale),
                                   arcade.color.WHITE,
                                   int(5 / 100 * self.scale))
 
-        arcade.draw_circle_filled(self.position_x + int(70 / 100 * self.scale), self.position_y - int(90 / 100 * self.scale), int(40 / 100 * self.scale),
+        arcade.draw_circle_filled(self.position_x + int(70 / 100 * self.scale),
+                                  self.position_y - int(90 / 100 * self.scale), int(40 / 100 * self.scale),
                                   arcade.color.WHITE,
                                   int(5100 * self.scale))
 
-        arcade.draw_circle_outline(self.position_x - int(70 / 100 * self.scale), self.position_y - int(90 / 100 * self.scale), int(40 / 100 * self.scale),
+        arcade.draw_circle_outline(self.position_x - int(70 / 100 * self.scale),
+                                   self.position_y - int(90 / 100 * self.scale), int(40 / 100 * self.scale),
                                    arcade.color.BLACK,
                                    int(5 / 100 * self.scale))
 
-        arcade.draw_circle_outline(self.position_x + int(70 / 100 * self.scale), self.position_y - int(90 / 100 * self.scale), int(40 / 100 * self.scale),
+        arcade.draw_circle_outline(self.position_x + int(70 / 100 * self.scale),
+                                   self.position_y - int(90 / 100 * self.scale), int(40 / 100 * self.scale),
                                    arcade.color.BLACK,
                                    int(5 / 100 * self.scale))
 
-        arcade.draw_line(self.position_x - int(110 / 100 * self.scale), self.position_y - int(90 / 100 * self.scale), self.position_x - int(30 / 100 * self.scale),
+        arcade.draw_line(self.position_x - int(110 / 100 * self.scale), self.position_y - int(90 / 100 * self.scale),
+                         self.position_x - int(30 / 100 * self.scale),
                          self.position_y - int(90 / 100 * self.scale),
                          arcade.color.BLACK, int(10 / 100 * self.scale))
 
-        arcade.draw_line(self.position_x + int(30 / 100 * self.scale), self.position_y - int(90 / 100 * self.scale), self.position_x + int(110 / 100 * self.scale),
+        arcade.draw_line(self.position_x + int(30 / 100 * self.scale), self.position_y - int(90 / 100 * self.scale),
+                         self.position_x + int(110 / 100 * self.scale),
                          self.position_y - int(90 / 100 * self.scale),
                          arcade.color.BLACK, int(10 / 100 * self.scale))
 
-        arcade.draw_rectangle_filled(self.position_x, self.position_y - int(110 / 100 * self.scale), int(240 / 100 * self.scale), int(40 / 100 * self.scale),
+        arcade.draw_rectangle_filled(self.position_x, self.position_y - int(110 / 100 * self.scale),
+                                     int(240 / 100 * self.scale), int(40 / 100 * self.scale),
                                      self.snow_color)
 
     def update(self):
