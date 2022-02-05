@@ -105,7 +105,7 @@ class Snowman:
         self.scale = scale
         self.snow_color = snow_color
         self.movement_speed = movement_speed
-        self.laser_sound = arcade.load_sound("laser.wav")
+        self.laser_sound = arcade.load_sound(":resources:sounds/error4.wav")
         self.laser_sound_player = None
 
     def draw(self):
@@ -239,22 +239,30 @@ class Snowman:
         self.position_y += self.change_y
         self.position_x += self.change_x
 
-        # See if the snowman hit the edge of the screen. If so, change direction
+        # See if the snowman hit the edge of the screen. If so, play sound
+        bump = False
         if self.position_x < int(150 / 100 * self.scale):
             self.position_x = int(150 / 100 * self.scale)
-            arcade.play_sound(self.laser_sound)
+            self.change_x = 0
+            bump = True
 
-        if self.position_x > SCREEN_WIDTH - int(150 / 100 * self.scale):
+        elif self.position_x > SCREEN_WIDTH - int(150 / 100 * self.scale):
             self.position_x = SCREEN_WIDTH - int(150 / 100 * self.scale)
-            arcade.play_sound(self.laser_sound)
+            self.change_x = 0
+            bump = True
 
-        if self.position_y < (int(90 / 100 * self.scale)):
+        elif self.position_y < (int(90 / 100 * self.scale)):
             self.position_y = (int(90 / 100 * self.scale))
-            arcade.play_sound(self.laser_sound)
+            self.change_y = 0
+            bump = True
 
-        if self.position_y > (SCREEN_HEIGHT / 3) + (int(90 / 100 * self.scale)):
+        elif self.position_y > (SCREEN_HEIGHT / 3) + (int(90 / 100 * self.scale)):
             self.position_y = (SCREEN_HEIGHT / 3) + (int(90 / 100 * self.scale))
-            arcade.play_sound(self.laser_sound)
+            self.change_y = 0
+            bump = True
+
+        if (not self.laser_sound_player or not self.laser_sound_player.playing) and bump:
+            self.laser_sound_player = arcade.play_sound(self.laser_sound)
 
 
 class MyGame(arcade.Window):
