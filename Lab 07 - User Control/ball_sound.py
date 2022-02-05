@@ -1,7 +1,7 @@
 import arcade
 
-SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 480
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 
 
 class Ball:
@@ -69,6 +69,18 @@ class MyGame(arcade.Window):
         ball = Ball(150, 250, -3, -1, 15, arcade.color.FOREST_GREEN)
         self.ball_list.append(ball)
 
+        ball = Ball(200, 350, -3, 1, 15, arcade.color.DESIRE)
+        self.ball_list.append(ball)
+
+        ball = Ball(250, 450, 3, -1, 15, arcade.color.DODGER_BLUE)
+        self.ball_list.append(ball)
+
+        ball = Ball(300, 550, 3, 1, 15, arcade.color.DARK_TANGERINE)
+        self.ball_list.append(ball)
+
+        ball = Ball(350, 450, -2, -3, 15, arcade.color.ELECTRIC_YELLOW)
+        self.ball_list.append(ball)
+
     def on_draw(self):
         """ Called whenever we need to draw the window. """
         arcade.start_render()
@@ -88,7 +100,7 @@ class MyGame(arcade.Window):
 
 
 def main():
-    window = MyGame(640, 480, "Drawing Example")
+    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, "Drawing Example")
 
     arcade.run()
 
