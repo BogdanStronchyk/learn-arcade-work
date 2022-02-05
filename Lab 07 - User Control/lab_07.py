@@ -260,7 +260,7 @@ class Snowman:
             self.position_y = (SCREEN_HEIGHT / 3) + (int(90 / 100 * self.scale))
             self.change_y = 0
             bump = True
-
+#
         if (not self.laser_sound_player or not self.laser_sound_player.playing) and bump:
             self.laser_sound_player = arcade.play_sound(self.laser_sound)
 
