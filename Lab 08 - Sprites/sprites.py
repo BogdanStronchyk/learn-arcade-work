@@ -25,10 +25,10 @@ MOVEMENT_SPEED = 3
 FPS = 0
 LIVES = 3
 LUCK = 0
+trig = False
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Sprite Collect Coins Example"
-
 
 
 class Stone(arcade.Sprite):
@@ -80,7 +80,6 @@ class Coin(arcade.Sprite):
 
 
 class Heart(arcade.Sprite):
-
     def __init__(self, filename, sprite_scaling):
 
         super().__init__(filename, sprite_scaling)
@@ -88,8 +87,19 @@ class Heart(arcade.Sprite):
         self.change_x = 0
         self.change_y = 0
 
+    def repos(self):
+        global trig
+        self.center_x = random.randrange(20, SCREEN_WIDTH - 20)
+        self.center_y = random.randrange(20, SCREEN_HEIGHT - 20)
+        self.change_x = 5
+        self.change_y = 5
+        trig = False
+
     def remove(self):
+        global trig
         self.remove_from_sprite_lists()
+        if trig:
+            self.repos()
 
     def update(self):
 
@@ -210,10 +220,7 @@ class MyGame(arcade.Window):
             heart = Heart(":resources:images/items/gemBlue.png", SPRITE_SCALING_HEART)
 
             # Position the heart
-            heart.center_x = random.randrange(20, SCREEN_WIDTH - 20)
-            heart.center_y = random.randrange(20, SCREEN_HEIGHT - 20)
-            heart.change_x = 5
-            heart.change_y = 5
+            heart.repos()
 
             # Add the coin to the lists
             self.heart_list.append(heart)
@@ -261,14 +268,14 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time):
         """ Movement and game logic """
-
+        global trig
         # FPS counter
         self.fps = 1 / delta_time
 
         # Chance to spawn a heart (1/3600)
         self.luck = random.randint(1, int(self.fps) * 20)
-        if not 1:
-            self.heart.lock_heart = True
+        if self.luck == 1:
+            trig = True
 
         # keyboard movement
         self.player_sprite.center_x += self.player_sprite.change_x
