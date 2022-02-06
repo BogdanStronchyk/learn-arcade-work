@@ -93,13 +93,13 @@ class Heart(arcade.Sprite):
         global trig
         self.center_x = random.randint(60, SCREEN_WIDTH - 60)
         self.center_y = random.randint(60, SCREEN_HEIGHT - 60)
-        self.change_x = 5
-        self.change_y = 5
+        self.change_x = random.randint(-5, 5)
+        self.change_y = random.randint(-5, 5)
         arcade.play_sound(self.heart_appeared_sound)
         trig = False
 
     def remove(self):
-        global trig, trig
+        global trig
         self.remove_from_sprite_lists()
         if trig:
             self.repos()
@@ -137,7 +137,6 @@ class MyGame(arcade.Window):
         self.hit_sound = arcade.load_sound(":resources:sounds/error1.wav")
         self.coin_sound = arcade.load_sound(":resources:sounds/coin2.wav")
         self.heart_taken_sound = arcade.load_sound(":resources:sounds/upgrade3.wav")
-
         self.game_over = arcade.load_sound(":resources:sounds/gameover4.wav")
         self.sound_player = None
 
@@ -162,11 +161,13 @@ class MyGame(arcade.Window):
 
         # Count luck
         self.luck = LUCK
-        self.lock_heart = None
-        arcade.set_background_color(arcade.color.AMAZON)
+        self.background = None
 
     def setup(self):
         """ Set up the game and initialize the variables. """
+
+        # Background
+        self.background = arcade.load_texture(":resources:images/backgrounds/abstract_1.jpg")
 
         # Sprite lists
         self.player_list = arcade.SpriteList()
@@ -235,6 +236,11 @@ class MyGame(arcade.Window):
     def on_draw(self):
         """ Draw everything """
         self.clear()
+
+        # Draw the background texture
+        arcade.draw_lrwh_rectangle_textured(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
+
+        # Draw texture lists
         self.coin_list.draw()
         self.stone_list.draw()
         self.player_list.draw()
