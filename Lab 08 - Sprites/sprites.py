@@ -25,8 +25,7 @@ MOVEMENT_SPEED = 3
 FPS = 0
 LIVES = 3
 LUCK = 0
-trig = False
-trig1 = True
+trig = True
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Sprite Collect Coins Example"
@@ -87,20 +86,21 @@ class Heart(arcade.Sprite):
 
         self.change_x = 0
         self.change_y = 0
+        self.heart_appeared_sound = arcade.load_sound(":resources:sounds/upgrade5.wav")
 
     def repos(self):
-        global trig1
+        global trig
         self.center_x = random.randrange(20, SCREEN_WIDTH - 20)
         self.center_y = random.randrange(20, SCREEN_HEIGHT - 20)
         self.change_x = 5
         self.change_y = 5
-
-        trig1 = False
+        arcade.play_sound(self.heart_appeared_sound)
+        trig = False
 
     def remove(self):
-        global trig, trig1
+        global trig, trig
         self.remove_from_sprite_lists()
-        if trig1:
+        if trig:
             self.repos()
 
     def update(self):
@@ -136,7 +136,7 @@ class MyGame(arcade.Window):
         self.hit_sound = arcade.load_sound(":resources:sounds/error1.wav")
         self.coin_sound = arcade.load_sound(":resources:sounds/coin2.wav")
         self.heart_taken_sound = arcade.load_sound(":resources:sounds/upgrade3.wav")
-        self.heart_appeared_sound = arcade.load_sound(":resources:sounds/upgrade5.wav")
+
         self.game_over = arcade.load_sound(":resources:sounds/gameover4.wav")
         self.sound_player = None
 
@@ -216,7 +216,7 @@ class MyGame(arcade.Window):
 
     def setup_heart(self):
 
-        global trig1
+        global trig
         # Create the heart
         for i in range(HEART_COUNT):
             # Create the heart instance
@@ -224,13 +224,12 @@ class MyGame(arcade.Window):
             heart = Heart(":resources:images/items/gemBlue.png", SPRITE_SCALING_HEART)
 
             # Position the heart
-            if trig1:
+            if trig:
                 heart.repos()
-                trig1 = False
+                trig = False
 
             # Add the coin to the lists
             self.heart_list.append(heart)
-            arcade.play_sound(self.heart_appeared_sound)
 
     def on_draw(self):
         """ Draw everything """
@@ -275,7 +274,7 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time):
         """ Movement and game logic """
-        global trig1
+        global trig
         # FPS counter
         self.fps = 1 / delta_time
 
@@ -346,7 +345,7 @@ class MyGame(arcade.Window):
             # Reset the coin to a random spot above the screen
 
             heart.remove()
-            trig1 = True
+            trig = True
 
             arcade.play_sound(self.heart_taken_sound)
             self.lives += 1
