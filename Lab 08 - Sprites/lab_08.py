@@ -1,12 +1,12 @@
 """
-Sprite Collect Coins
+Sprite Collect gears
 
 Simple program to show basic sprite usage.
 
 Artwork from https://kenney.nl
 
 If Python and Arcade are installed, this example can be run from the command line with:
-python -m arcade.examples.sprite_collect_coins
+python -m arcade.examples.sprite_collect_gears
 ***********************
 Необходимо исправить столкновения шестерёнок.
 Проблема в их генерации (99%). Они генерируются
@@ -29,7 +29,7 @@ import time
 # --- Constants ---
 SPRITE_SCALING_PLAYER = 0.5
 SPRITE_SCALING_GEAR = .2
-SPRITE_SCALING_STONE = 1
+SPRITE_SCALING_LASER = 1
 SPRITE_SCALING_HEART = 0.25
 GEAR_COUNT = 50
 LASER_COUNT = 20
@@ -41,7 +41,7 @@ LIVES = 3
 CHANCE = 1  # amount of seconds between the appearance of the heart
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Sprite Collect Coins Example"
+SCREEN_TITLE = "Sprite Collect Gears"
 
 # Flags
 trig = True
@@ -78,18 +78,18 @@ class Gear(arcade.Sprite):
         self.center_y_t = None
 
     def repos(self, *gears):
-        # Position the coin
+        # Position the gear
         self.center_x = random.randint(20, SCREEN_WIDTH - 20)
         self.center_y = random.randint(20, SCREEN_HEIGHT - 20)
         self.change_x = random.randint(-3, 4)
         self.change_y = random.randint(-3, 4)
 
-        # fix the static coins
+        # fix the static gears
         while self.change_x == 0 or self.change_y == 0:
             self.change_x = random.randint(-3, 4)
             self.change_y = random.randint(-3, 4)
 
-        # fix sticking groups of coins
+        # fix sticking groups of gears
         # print(gears)
 
     def update(self):
@@ -107,7 +107,7 @@ class Gear(arcade.Sprite):
         if self.top > SCREEN_HEIGHT:
             self.change_y *= -1
 
-        # Move the coin
+        # Move the gear
         self.center_x += self.change_x
         self.center_y += self.change_y
 
@@ -219,7 +219,7 @@ class MyGame(arcade.Window):
         self.player_sprite.change_y = 0
         self.player_list.append(self.player_sprite)
 
-        # Create the coins
+        # Create the gears
         for i in range(GEAR_COUNT):
             # Create the laser instance
             # Gear image from kenney.nl
@@ -231,16 +231,16 @@ class MyGame(arcade.Window):
             # Add the gear to the lists
             self.gear_list.append(gear)
 
-        # Create the stones
+        # Create the lasers
         for i in range(LASER_COUNT):
             # Create the laser instance
             # Laser image from kenney.nl
-            laser = Laser(":resources:images/space_shooter/laserRed01.png", SPRITE_SCALING_STONE)
+            laser = Laser(":resources:images/space_shooter/laserRed01.png", SPRITE_SCALING_LASER)
 
             # Position the laser
             laser.reset_pos()
 
-            # Add the stones to the list
+            # Add the gears to the list
             self.laser_list.append(laser)
 
     def setup_heart(self):
@@ -375,8 +375,8 @@ class MyGame(arcade.Window):
             arcade.play_sound(self.coin_sound)
             self.score += 1
 
-        for stone in lasers_hit_list:
-            stone.reset_pos()
+        for laser in lasers_hit_list:
+            laser.reset_pos()
             arcade.play_sound(self.hit_sound)
             self.lives -= 1
             self.score -= 5
