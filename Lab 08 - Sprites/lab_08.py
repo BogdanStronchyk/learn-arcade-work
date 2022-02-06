@@ -7,6 +7,13 @@ Artwork from https://kenney.nl
 
 If Python and Arcade are installed, this example can be run from the command line with:
 python -m arcade.examples.sprite_collect_coins
+***********************
+Необходимо исправить столкновения шестерёнок.
+Проблема в их генерации (99%). Они генерируются
+слишком близко друг к другу и "залипают" друг в друге.
+Необходимо генерировать их в пустом месте.
+Флаг "feature" активирует столкновения.
+***********************
 """
 
 import random
@@ -15,7 +22,7 @@ import time
 
 # --- Constants ---
 SPRITE_SCALING_PLAYER = 0.5
-SPRITE_SCALING_COIN = .2
+SPRITE_SCALING_GEAR = .2
 SPRITE_SCALING_STONE = 1
 SPRITE_SCALING_HEART = 0.25
 GEAR_COUNT = 50
@@ -32,7 +39,7 @@ SCREEN_TITLE = "Sprite Collect Coins Example"
 
 # Flags
 trig = True
-
+feature = False
 
 class Laser(arcade.Sprite):
     def __init__(self, filename, sprite_scaling):
@@ -60,8 +67,10 @@ class Gear(arcade.Sprite):
 
         self.change_x = 0
         self.change_y = 0
+        self.center_x_t = None
+        self.center_y_t = None
 
-    def repos(self):
+    def repos(self, *gears):
         # Position the coin
         self.center_x = random.randint(20, SCREEN_WIDTH - 20)
         self.center_y = random.randint(20, SCREEN_HEIGHT - 20)
@@ -73,10 +82,8 @@ class Gear(arcade.Sprite):
             self.change_x = random.randint(-3, 4)
             self.change_y = random.randint(-3, 4)
 
-        if 20 > self.center_x < SCREEN_WIDTH - 20 \
-                and 20 > self.center_y < SCREEN_HEIGHT - 20:
-            self.remove_from_sprite_lists()
-            self.repos()
+        # fix sticking groups of coins
+        # print(gears)
 
     def update(self):
 
@@ -209,13 +216,13 @@ class MyGame(arcade.Window):
         for i in range(GEAR_COUNT):
             # Create the laser instance
             # Gear image from kenney.nl
-            laser = Gear(":resources:images/enemies/saw.png", SPRITE_SCALING_COIN)
+            gear = Gear(":resources:images/enemies/saw.png", SPRITE_SCALING_GEAR)
 
             # Position the laser
-            laser.repos()
+            gear.repos()
 
             # Add the gear to the lists
-            self.gear_list.append(laser)
+            self.gear_list.append(gear)
 
         # Create the stones
         for i in range(LASER_COUNT):
@@ -339,29 +346,36 @@ class MyGame(arcade.Window):
         self.laser_list.update()
         self.heart_list.update()
         # Generate a list of all sprites that collided with the player.
-        coins_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.gear_list)
-        stone_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.laser_list)
-        heart_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.heart_list)
+        gears_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.gear_list)
+        lasers_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.laser_list)
+        hearts_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.heart_list)
+
+        # if the gear hits another gear
+        if feature:
+            for gear_hit in self.gear_list:
+                gears_to_gears_hit_list = arcade.check_for_collision_with_list(gear_hit, self.gear_list)
+                for gears in gears_to_gears_hit_list:
+                    gears.change_x *= -1
+                    gears.change_y *= -1
 
         # Loop through each colliding sprite, replace it, and add to the score.
-        for coin in coins_hit_list:
-            # Reset the coin to a random spot above the screen
-            coin.center_y = random.randint(30, SCREEN_WIDTH - 30)
-            coin.center_x = random.randint(30, SCREEN_HEIGHT - 30)
+        for gear in gears_hit_list:
+            # Reset the gear to a random spot above the screen
+            gear.repos()
 
-            coin.update()
+            gear.update()
 
             arcade.play_sound(self.coin_sound)
             self.score += 1
 
-        for stone in stone_hit_list:
+        for stone in lasers_hit_list:
             stone.reset_pos()
             arcade.play_sound(self.hit_sound)
             self.lives -= 1
             self.score -= 5
 
-        for heart in heart_hit_list:
-            # Reset the coin to a random spot above the screen
+        for heart in hearts_hit_list:
+            # Reset the gear to a random spot above the screen
 
             heart.remove()
             trig = True
@@ -370,11 +384,11 @@ class MyGame(arcade.Window):
             self.lives += 1
             self.score += 20
 
-        if self.lives == 0:
-            time.sleep(1)
-            arcade.play_sound(self.game_over)
-            time.sleep(2)
-            arcade.close_window()
+        # if self.lives == 0:
+        #     time.sleep(1)
+        #     arcade.play_sound(self.game_over)
+        #     time.sleep(2)
+        #     arcade.close_window()
 
 
 def main():
