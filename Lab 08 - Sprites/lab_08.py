@@ -390,11 +390,11 @@ class MyGame(arcade.Window):
             self.lives += 1
             self.score += 20
 
-        # if self.lives == 0:
-        #     time.sleep(1)
-        #     arcade.play_sound(self.game_over)
-        #     time.sleep(2)
-        #     arcade.close_window()
+        if self.lives == 0:
+            time.sleep(1)
+            arcade.play_sound(self.game_over)
+            time.sleep(2)
+            arcade.close_window()
 
 
 def main():
