@@ -24,11 +24,13 @@ HEART_COUNT = 1
 MOVEMENT_SPEED = 3
 FPS = 0
 LIVES = 3
-LUCK = 0
-trig = True
+LUCK = None
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Sprite Collect Coins Example"
+
+# Flags
+trig = True
 
 
 class Stone(arcade.Sprite):
@@ -40,9 +42,8 @@ class Stone(arcade.Sprite):
         self.change_y = 0
 
     def reset_pos(self):
-        self.center_y = random.randrange(SCREEN_HEIGHT + 20,
-                                         SCREEN_HEIGHT + 100)
-        self.center_x = random.randrange(SCREEN_WIDTH)
+        self.center_y = random.randint(SCREEN_HEIGHT + 20, SCREEN_HEIGHT + 100)
+        self.center_x = random.randint(20, SCREEN_WIDTH)
 
     def update(self):
         if self.top < 0:
@@ -90,8 +91,8 @@ class Heart(arcade.Sprite):
 
     def repos(self):
         global trig
-        self.center_x = random.randrange(60, SCREEN_WIDTH - 60)
-        self.center_y = random.randrange(60, SCREEN_HEIGHT - 60)
+        self.center_x = random.randint(60, SCREEN_WIDTH - 60)
+        self.center_y = random.randint(60, SCREEN_HEIGHT - 60)
         self.change_x = 5
         self.change_y = 5
         arcade.play_sound(self.heart_appeared_sound)
@@ -279,7 +280,7 @@ class MyGame(arcade.Window):
         self.fps = 1 / delta_time
 
         # Chance to spawn a heart (1/3600)
-        self.luck = random.randint(1, int(self.fps) * 15)
+        self.luck = random.randint(1, int(self.fps) * 3600)
         if self.luck == 1:
             self.setup_heart()
 
