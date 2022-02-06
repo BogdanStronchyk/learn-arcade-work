@@ -195,7 +195,7 @@ class MyGame(arcade.Window):
         # Score
         self.score = 0
 
-        # Set up the player
+        # Set up the player character
         # Character image from kenney.nl
         img = ":resources:images/animated_characters/robot/robot_idle.png"
         self.player_sprite = arcade.Sprite(img, SPRITE_SCALING_PLAYER)
