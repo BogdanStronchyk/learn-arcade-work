@@ -26,6 +26,7 @@ FPS = 0
 LIVES = 3
 LUCK = 0
 trig = False
+trig1 = True
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Sprite Collect Coins Example"
@@ -88,17 +89,18 @@ class Heart(arcade.Sprite):
         self.change_y = 0
 
     def repos(self):
-        global trig
+        global trig1
         self.center_x = random.randrange(20, SCREEN_WIDTH - 20)
         self.center_y = random.randrange(20, SCREEN_HEIGHT - 20)
         self.change_x = 5
         self.change_y = 5
-        trig = False
+
+        trig1 = False
 
     def remove(self):
-        global trig
+        global trig, trig1
         self.remove_from_sprite_lists()
-        if trig:
+        if trig1:
             self.repos()
 
     def update(self):
@@ -170,7 +172,6 @@ class MyGame(arcade.Window):
         self.coin_list = arcade.SpriteList()
         self.stone_list = arcade.SpriteList()
         self.heart_list = arcade.SpriteList()
-
         # Score
         self.score = 0
 
@@ -213,6 +214,9 @@ class MyGame(arcade.Window):
             # Add the stones to the list
             self.stone_list.append(stone)
 
+    def setup_heart(self):
+
+        global trig1
         # Create the heart
         for i in range(HEART_COUNT):
             # Create the heart instance
@@ -220,10 +224,13 @@ class MyGame(arcade.Window):
             heart = Heart(":resources:images/items/gemBlue.png", SPRITE_SCALING_HEART)
 
             # Position the heart
-            heart.repos()
+            if trig1:
+                heart.repos()
+                trig1 = False
 
             # Add the coin to the lists
             self.heart_list.append(heart)
+            arcade.play_sound(self.heart_appeared_sound)
 
     def on_draw(self):
         """ Draw everything """
@@ -268,14 +275,14 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time):
         """ Movement and game logic """
-        global trig
+        global trig1
         # FPS counter
         self.fps = 1 / delta_time
 
         # Chance to spawn a heart (1/3600)
-        self.luck = random.randint(1, int(self.fps) * 20)
+        self.luck = random.randint(1, int(self.fps) * 5)
         if self.luck == 1:
-            trig = True
+            self.setup_heart()
 
         # keyboard movement
         self.player_sprite.center_x += self.player_sprite.change_x
@@ -337,7 +344,9 @@ class MyGame(arcade.Window):
         for heart in heart_hit_list:
 
             # Reset the coin to a random spot above the screen
+
             heart.remove()
+            trig1 = True
 
             arcade.play_sound(self.heart_taken_sound)
             self.lives += 1
