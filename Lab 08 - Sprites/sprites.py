@@ -31,7 +31,7 @@ SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Sprite Collect Coins Example"
 
 
-class Stone(arcade.Sprite):
+class Laser(arcade.Sprite):
     def __init__(self, filename, sprite_scaling):
 
         super().__init__(filename, sprite_scaling)
@@ -189,7 +189,7 @@ class MyGame(arcade.Window):
         for i in range(COIN_COUNT):
 
             # Create the coin instance
-            # Coin image from kenney.nl
+            # Gear image from kenney.nl
             coin = Coin(":resources:images/items/coinGold.png", SPRITE_SCALING_COIN)
 
             # Position the coin
@@ -204,7 +204,7 @@ class MyGame(arcade.Window):
         # Create the stones
         for i in range(STONE_COUNT):
             # Create the stone instance
-            # Stone image from kenney.nl
+            # Laser image from kenney.nl
             stone = Stone(":resources:images/space_shooter/meteorGrey_big4.png", SPRITE_SCALING_STONE)
 
             # Position the coin

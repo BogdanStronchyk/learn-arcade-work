@@ -15,16 +15,17 @@ import time
 
 # --- Constants ---
 SPRITE_SCALING_PLAYER = 0.5
-SPRITE_SCALING_COIN = .25
-SPRITE_SCALING_STONE = .25
+SPRITE_SCALING_COIN = .2
+SPRITE_SCALING_STONE = 1
 SPRITE_SCALING_HEART = 0.25
-COIN_COUNT = 50
-STONE_COUNT = 20
+GEAR_COUNT = 50
+LASER_COUNT = 20
+LASER_SPEED = 8
 HEART_COUNT = 1
 MOVEMENT_SPEED = 3
 FPS = 0
 LIVES = 3
-LUCK = None
+CHANCE = 1  # amount of seconds between the appearance of the heart
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Sprite Collect Coins Example"
@@ -33,25 +34,25 @@ SCREEN_TITLE = "Sprite Collect Coins Example"
 trig = True
 
 
-class Stone(arcade.Sprite):
+class Laser(arcade.Sprite):
     def __init__(self, filename, sprite_scaling):
-
         super().__init__(filename, sprite_scaling)
 
         self.change_x = 0
         self.change_y = 0
+        self.angle = 180
 
     def reset_pos(self):
-        self.center_y = random.randint(SCREEN_HEIGHT + 20, SCREEN_HEIGHT + 100)
+        self.center_y = random.randint(SCREEN_HEIGHT + 20, SCREEN_HEIGHT * 2)
         self.center_x = random.randint(20, SCREEN_WIDTH)
 
     def update(self):
         if self.top < 0:
             self.reset_pos()
-        self.center_y -= 4
+        self.center_y -= LASER_SPEED
 
 
-class Coin(arcade.Sprite):
+class Gear(arcade.Sprite):
 
     def __init__(self, filename, sprite_scaling):
 
@@ -59,6 +60,23 @@ class Coin(arcade.Sprite):
 
         self.change_x = 0
         self.change_y = 0
+
+    def repos(self):
+        # Position the coin
+        self.center_x = random.randint(20, SCREEN_WIDTH - 20)
+        self.center_y = random.randint(20, SCREEN_HEIGHT - 20)
+        self.change_x = random.randint(-3, 4)
+        self.change_y = random.randint(-3, 4)
+
+        # fix the static coins
+        while self.change_x == 0 or self.change_y == 0:
+            self.change_x = random.randint(-3, 4)
+            self.change_y = random.randint(-3, 4)
+
+        if 20 > self.center_x < SCREEN_WIDTH - 20 \
+                and 20 > self.center_y < SCREEN_HEIGHT - 20:
+            self.remove_from_sprite_lists()
+            self.repos()
 
     def update(self):
 
@@ -93,8 +111,8 @@ class Heart(arcade.Sprite):
         global trig
         self.center_x = random.randint(60, SCREEN_WIDTH - 60)
         self.center_y = random.randint(60, SCREEN_HEIGHT - 60)
-        self.change_x = random.randint(-5, 5)
-        self.change_y = random.randint(-5, 5)
+        self.change_x = 5
+        self.change_y = 5
         arcade.play_sound(self.heart_appeared_sound)
         trig = False
 
@@ -134,7 +152,7 @@ class MyGame(arcade.Window):
 
         # Initialize sounds
         self.bump_sound = arcade.load_sound(":resources:sounds/error4.wav")
-        self.hit_sound = arcade.load_sound(":resources:sounds/error1.wav")
+        self.hit_sound = arcade.load_sound(":resources:sounds/hurt5.wav")
         self.coin_sound = arcade.load_sound(":resources:sounds/coin2.wav")
         self.heart_taken_sound = arcade.load_sound(":resources:sounds/upgrade3.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover4.wav")
@@ -142,8 +160,8 @@ class MyGame(arcade.Window):
 
         # Variables that will hold sprite lists
         self.player_list = None
-        self.coin_list = None
-        self.stone_list = None
+        self.gear_list = None
+        self.laser_list = None
         self.heart_list = None
 
         # Set up the player info
@@ -160,7 +178,7 @@ class MyGame(arcade.Window):
         self.lives = LIVES
 
         # Count luck
-        self.luck = LUCK
+        self.luck = None
         self.background = None
 
     def setup(self):
@@ -171,15 +189,15 @@ class MyGame(arcade.Window):
 
         # Sprite lists
         self.player_list = arcade.SpriteList()
-        self.coin_list = arcade.SpriteList()
-        self.stone_list = arcade.SpriteList()
+        self.gear_list = arcade.SpriteList()
+        self.laser_list = arcade.SpriteList()
         self.heart_list = arcade.SpriteList()
         # Score
         self.score = 0
 
         # Set up the player
         # Character image from kenney.nl
-        img = ":resources:images/animated_characters/female_person/femalePerson_idle.png"
+        img = ":resources:images/animated_characters/robot/robot_idle.png"
         self.player_sprite = arcade.Sprite(img, SPRITE_SCALING_PLAYER)
         self.player_sprite.center_x = 50
         self.player_sprite.center_y = 50
@@ -188,33 +206,28 @@ class MyGame(arcade.Window):
         self.player_list.append(self.player_sprite)
 
         # Create the coins
-        for i in range(COIN_COUNT):
+        for i in range(GEAR_COUNT):
+            # Create the laser instance
+            # Gear image from kenney.nl
+            laser = Gear(":resources:images/enemies/saw.png", SPRITE_SCALING_COIN)
 
-            # Create the coin instance
-            # Coin image from kenney.nl
-            coin = Coin(":resources:images/items/coinGold.png", SPRITE_SCALING_COIN)
+            # Position the laser
+            laser.repos()
 
-            # Position the coin
-            coin.center_x = random.randrange(60, SCREEN_WIDTH - 60)
-            coin.center_y = random.randrange(60, SCREEN_HEIGHT - 60)
-            coin.change_x = random.randrange(-3, 4)
-            coin.change_y = random.randrange(-3, 4)
-
-            # Add the coin to the lists
-            self.coin_list.append(coin)
+            # Add the gear to the lists
+            self.gear_list.append(laser)
 
         # Create the stones
-        for i in range(STONE_COUNT):
-            # Create the stone instance
-            # Stone image from kenney.nl
-            stone = Stone(":resources:images/space_shooter/meteorGrey_big4.png", SPRITE_SCALING_STONE)
+        for i in range(LASER_COUNT):
+            # Create the laser instance
+            # Laser image from kenney.nl
+            laser = Laser(":resources:images/space_shooter/laserRed01.png", SPRITE_SCALING_STONE)
 
-            # Position the coin
-            stone.center_x = random.randrange(20, SCREEN_WIDTH - 20)
-            stone.center_y = random.randrange(20, SCREEN_HEIGHT - 20)
+            # Position the laser
+            laser.reset_pos()
 
             # Add the stones to the list
-            self.stone_list.append(stone)
+            self.laser_list.append(laser)
 
     def setup_heart(self):
 
@@ -223,7 +236,7 @@ class MyGame(arcade.Window):
         for i in range(HEART_COUNT):
             # Create the heart instance
             # Heart image from kenney.nl
-            heart = Heart(":resources:images/items/gemBlue.png", SPRITE_SCALING_HEART)
+            heart = Heart(":resources:images/items/gemYellow.png", SPRITE_SCALING_HEART)
 
             # Position the heart
             if trig:
@@ -241,18 +254,18 @@ class MyGame(arcade.Window):
         arcade.draw_lrwh_rectangle_textured(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
 
         # Draw texture lists
-        self.coin_list.draw()
-        self.stone_list.draw()
+        self.gear_list.draw()
+        self.laser_list.draw()
         self.player_list.draw()
         self.heart_list.draw()
 
         # Put the text on the screen.
         output = f"Score: {self.score}"
-        arcade.draw_text(text=output, start_x=SCREEN_WIDTH * 0.01, start_y=SCREEN_HEIGHT*0.02,
+        arcade.draw_text(text=output, start_x=SCREEN_WIDTH * 0.01, start_y=SCREEN_HEIGHT * 0.02,
                          color=arcade.color.WHITE, font_size=14)
 
         output = f"FPS: {self.fps:.2f}"
-        arcade.draw_text(text=output, start_x=SCREEN_WIDTH*0.8, start_y=SCREEN_HEIGHT*0.9,
+        arcade.draw_text(text=output, start_x=SCREEN_WIDTH * 0.8, start_y=SCREEN_HEIGHT * 0.9,
                          color=arcade.color.WHITE, font_size=14)
 
         output = f"Lives: {self.lives}"
@@ -281,13 +294,14 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time):
         """ Movement and game logic """
-        global trig
+        global trig, CHANCE
         # FPS counter
         self.fps = 1 / delta_time
 
         # Chance to spawn a heart (1/3600)
-        self.luck = random.randint(1, int(self.fps) * 3600)
+        self.luck = random.randint(1, int(self.fps) * CHANCE * 60)
         if self.luck == 1:
+            print('Heart!')
             self.setup_heart()
 
         # keyboard movement
@@ -321,17 +335,16 @@ class MyGame(arcade.Window):
         if (not self.sound_player or not self.sound_player.playing) and bump:
             self.sound_player = arcade.play_sound(self.bump_sound)
 
-        self.coin_list.update()
-        self.stone_list.update()
+        self.gear_list.update()
+        self.laser_list.update()
         self.heart_list.update()
         # Generate a list of all sprites that collided with the player.
-        coins_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.coin_list)
-        stone_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.stone_list)
+        coins_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.gear_list)
+        stone_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.laser_list)
         heart_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.heart_list)
 
         # Loop through each colliding sprite, replace it, and add to the score.
         for coin in coins_hit_list:
-
             # Reset the coin to a random spot above the screen
             coin.center_y = random.randint(30, SCREEN_WIDTH - 30)
             coin.center_x = random.randint(30, SCREEN_HEIGHT - 30)
@@ -348,7 +361,6 @@ class MyGame(arcade.Window):
             self.score -= 5
 
         for heart in heart_hit_list:
-
             # Reset the coin to a random spot above the screen
 
             heart.remove()
@@ -358,7 +370,7 @@ class MyGame(arcade.Window):
             self.lives += 1
             self.score += 20
 
-        if self.lives < 1:
+        if self.lives == 0:
             time.sleep(1)
             arcade.play_sound(self.game_over)
             time.sleep(2)
