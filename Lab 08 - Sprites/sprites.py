@@ -90,8 +90,8 @@ class Heart(arcade.Sprite):
 
     def repos(self):
         global trig
-        self.center_x = random.randrange(20, SCREEN_WIDTH - 20)
-        self.center_y = random.randrange(20, SCREEN_HEIGHT - 20)
+        self.center_x = random.randrange(60, SCREEN_WIDTH - 60)
+        self.center_y = random.randrange(60, SCREEN_HEIGHT - 60)
         self.change_x = 5
         self.change_y = 5
         arcade.play_sound(self.heart_appeared_sound)
@@ -193,8 +193,8 @@ class MyGame(arcade.Window):
             coin = Coin(":resources:images/items/coinGold.png", SPRITE_SCALING_COIN)
 
             # Position the coin
-            coin.center_x = random.randrange(20, SCREEN_WIDTH - 20)
-            coin.center_y = random.randrange(20, SCREEN_HEIGHT - 20)
+            coin.center_x = random.randrange(60, SCREEN_WIDTH - 60)
+            coin.center_y = random.randrange(60, SCREEN_HEIGHT - 60)
             coin.change_x = random.randrange(-3, 4)
             coin.change_y = random.randrange(-3, 4)
 
@@ -279,7 +279,7 @@ class MyGame(arcade.Window):
         self.fps = 1 / delta_time
 
         # Chance to spawn a heart (1/3600)
-        self.luck = random.randint(1, int(self.fps) * 5)
+        self.luck = random.randint(1, int(self.fps) * 15)
         if self.luck == 1:
             self.setup_heart()
 
@@ -349,6 +349,7 @@ class MyGame(arcade.Window):
 
             arcade.play_sound(self.heart_taken_sound)
             self.lives += 1
+            self.score += 20
 
         if self.lives < 1:
             time.sleep(1)
