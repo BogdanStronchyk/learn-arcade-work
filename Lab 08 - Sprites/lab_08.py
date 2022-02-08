@@ -321,7 +321,6 @@ class MyGame(arcade.Window):
         self.player_sprite.center_y += self.player_sprite.change_y
 
         # See if the player hit the edge of the screen. If so, play sound
-
         bump = False
         if self.player_sprite.left < 0:
             self.player_sprite.change_x = 0
