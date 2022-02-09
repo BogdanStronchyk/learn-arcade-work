@@ -20,7 +20,7 @@ SPRITE_SCALING_PLAYER = 0.5
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-PLAYER_MOVEMENT_SPEED = 7
+PLAYER_MOVEMENT_SPEED = 9
 
 CAMERA_SPEED = 1
 
@@ -61,6 +61,11 @@ class MyGame(arcade.Window):
         self.time_passed_after_right_pressed = 0
         self.time_passed_after_up_pressed = 0
         self.time_passed_after_down_pressed = 0
+
+        self.left_t = 0
+        self.right_t = 0
+        self.top_t = 0
+        self.bottom_t = 0
 
         # Create the cameras. One for the GUI, one for the sprites.
         # We scroll the 'sprite world' but not the GUI.
@@ -163,7 +168,7 @@ class MyGame(arcade.Window):
         # Keyboard movement
         if self.up_pressed or self.down_pressed or self.left_pressed or self.right_pressed:
             self.timer += delta_time
-            print(self.timer)
+            # print(self.timer)
         else:
             self.timer = 0
 
@@ -177,26 +182,63 @@ class MyGame(arcade.Window):
             self.player_sprite.change_x = 0
             self.player_sprite.left = 0
             bump = True
+            if self.player_sprite.left - self.left_t == 0:
+                bump = False
 
-        if self.player_sprite.right > SCREEN_WIDTH:
+        elif self.player_sprite.right > SCREEN_WIDTH:
             self.player_sprite.change_x = 0
             self.player_sprite.right = SCREEN_WIDTH
             bump = True
+            if self.player_sprite.right - self.right_t == 0:
+                bump = False
 
         if self.player_sprite.bottom < 0:
             self.player_sprite.change_y = 0
             self.player_sprite.bottom = 0
             bump = True
+            if self.player_sprite.bottom - self.bottom_t == 0:
+                bump = False
 
-        if self.player_sprite.top > SCREEN_HEIGHT:
+        elif self.player_sprite.top > SCREEN_HEIGHT:
             self.player_sprite.change_y = 0
             self.player_sprite.top = SCREEN_HEIGHT
             bump = True
+            if self.player_sprite.top - self.top_t == 0:
+                bump = False
+
+        # if self.player_sprite.left == 0 and self.player_sprite.left - self.left_t == 0:
+        #     bump = False
+
+        # elif self.player_sprite.right == SCREEN_WIDTH and self.player_sprite.right - self.right_t == 0:
+        #     bump = False
+
+        # if self.player_sprite.top == SCREEN_HEIGHT and self.player_sprite.top - self.top_t == 0:
+        #     bump = False
+
+        # elif self.player_sprite.bottom == 0 and self.player_sprite.bottom - self.bottom_t == 0:
+        #     bump = False
+
+        # if ((self.player_sprite.left == 0 and self.player_sprite.left - self.left_t == 0)
+        #         or (self.player_sprite.right == SCREEN_WIDTH and self.player_sprite.right - self.right_t == 0)) \
+        #         and (self.player_sprite.top == SCREEN_HEIGHT or self.player_sprite.bottom == 0):
+        #     bump = True
+        #
+        # if ((self.player_sprite.top == SCREEN_WIDTH and self.player_sprite.top - self.top_t == 0)
+        #         or (self.player_sprite.bottom == 0 and self.player_sprite.bottom - self.bottom_t == 0)) \
+        #         and (self.player_sprite.left == 0 or self.player_sprite.right == SCREEN_HEIGHT):
+        #     bump = True
 
         #  If there is no player, or the playing boolean is false, and the player has bumped, we’ll play the sound.
         if (not self.sound_player or not self.sound_player.playing) and bump:
             self.sound_player = arcade.play_sound(self.bump_sound)
             bump = False
+
+        self.left_t = self.player_sprite.left
+        self.right_t = self.player_sprite.right
+        self.top_t = self.player_sprite.top
+        self.bottom_t = self.player_sprite.bottom
+
+        print(self.left_t, self.right_t, self.top_t, self.bottom_t)
 
         # We used to update sprite lists like this:
         # self.player_list.update()
