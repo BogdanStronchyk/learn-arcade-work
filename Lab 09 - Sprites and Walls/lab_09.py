@@ -1,4 +1,16 @@
-""" Sprite Sample Program """
+""" Sprite Sample Program
+
+!!!!!!!!!!!!!!!!!!!!!!!
+Мой код улучшенного управления плохо сочетается с кодом остановки при столкновении со стеной.
+
+Проблема: Звук удара о границу экрана проигрывается постоянно,
+пока нажата кнопка движения по направлению к стене
+
+Причина: переопределение переменных self.player_sprite.change_x/y с каждым кадром
+
+Устранение: 1. запрет переопределения переменных
+!!!!!!!!!!!!!!!!!!!!!!!
+"""
 
 import arcade
 
@@ -14,7 +26,6 @@ CAMERA_SPEED = 1
 
 # --- Variables ---
 bump = False
-player_movement_speed = PLAYER_MOVEMENT_SPEED
 
 
 class MyGame(arcade.Window):
@@ -135,6 +146,8 @@ class MyGame(arcade.Window):
         # Draw the sprites
         self.wall_list.draw()
         self.player_list.draw()
+        arcade.draw_rectangle_outline(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                                      SCREEN_WIDTH, SCREEN_HEIGHT, arcade.color.BLACK, 1)
 
         # Select the (unscrolled) camera for our GUI
         self.camera_for_gui.use()
@@ -143,72 +156,40 @@ class MyGame(arcade.Window):
         arcade.draw_text(f"FPS: {self.fps:.2f}", SCREEN_WIDTH * 0.75, SCREEN_HEIGHT * 0.9, arcade.color.WHITE, 24)
 
     def update(self, delta_time):
-        global bump, player_movement_speed
-
+        global bump
         # calculating fps
         self.fps = 1 / delta_time
 
         # Keyboard movement
         if self.up_pressed or self.down_pressed or self.left_pressed or self.right_pressed:
             self.timer += delta_time
+            print(self.timer)
         else:
             self.timer = 0
-            player_movement_speed = PLAYER_MOVEMENT_SPEED
 
-        if self.up_pressed and not self.down_pressed:
-            self.player_sprite.change_y = player_movement_speed
-            self.time_passed_after_up_pressed = self.timer
-
-        if self.down_pressed and not self.up_pressed:
-            self.player_sprite.change_y = -player_movement_speed
-            self.time_passed_after_down_pressed = self.timer
-
-        if self.left_pressed and not self.right_pressed:
-            self.player_sprite.change_x = -player_movement_speed
-            self.time_passed_after_left_pressed = self.timer
-
-        if self.right_pressed and not self.left_pressed:
-            self.player_sprite.change_x = player_movement_speed
-            self.time_passed_after_right_pressed = self.timer
-
-        if self.up_pressed and self.down_pressed \
-                and self.time_passed_after_up_pressed < self.time_passed_after_down_pressed:
-            self.player_sprite.change_y = player_movement_speed
-            print("up and down button pressed! down first")
-
-        if self.down_pressed and self.up_pressed \
-                and self.time_passed_after_up_pressed > self.time_passed_after_down_pressed:
-            self.player_sprite.change_y = -player_movement_speed
-            print("up and down button pressed! up first")
-
-        if self.left_pressed and self.right_pressed \
-                and self.time_passed_after_left_pressed < self.time_passed_after_right_pressed:
-            self.player_sprite.change_x = -player_movement_speed
-            print("up and down button pressed! right first")
-
-        if self.right_pressed and self.left_pressed \
-                and self.time_passed_after_left_pressed > self.time_passed_after_right_pressed:
-            self.player_sprite.change_x = player_movement_speed
-            print("up and down button pressed! left first")
+        # move character:
+        self.control()
+        self.player_sprite.center_x += self.player_sprite.change_x
+        self.player_sprite.center_y += self.player_sprite.change_y
 
         # See if the player hit the edge of the screen. If so, play sound
         if self.player_sprite.left < 0:
-            player_movement_speed = 0
+            self.player_sprite.change_x = 0
             self.player_sprite.left = 0
             bump = True
 
-        elif self.player_sprite.right > SCREEN_WIDTH:
-            player_movement_speed = 0
+        if self.player_sprite.right > SCREEN_WIDTH:
+            self.player_sprite.change_x = 0
             self.player_sprite.right = SCREEN_WIDTH
             bump = True
 
-        elif self.player_sprite.bottom < 0:
-            player_movement_speed = 0
+        if self.player_sprite.bottom < 0:
+            self.player_sprite.change_y = 0
             self.player_sprite.bottom = 0
             bump = True
 
-        elif self.player_sprite.top > SCREEN_HEIGHT:
-            player_movement_speed = 0
+        if self.player_sprite.top > SCREEN_HEIGHT:
+            self.player_sprite.change_y = 0
             self.player_sprite.top = SCREEN_HEIGHT
             bump = True
 
@@ -233,10 +214,13 @@ class MyGame(arcade.Window):
 
         if key == arcade.key.W:
             self.up_pressed = True
+
         elif key == arcade.key.S:
             self.down_pressed = True
+
         elif key == arcade.key.A:
             self.left_pressed = True
+
         elif key == arcade.key.D:
             self.right_pressed = True
 
@@ -259,6 +243,44 @@ class MyGame(arcade.Window):
             self.right_pressed = False
             self.player_sprite.change_x = 0
             self.time_passed_after_right_pressed = 0
+
+    def control(self):
+        global bump
+        if self.up_pressed and not self.down_pressed:
+            self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
+            self.time_passed_after_up_pressed = self.timer
+
+        if self.down_pressed and not self.up_pressed:
+            self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
+            self.time_passed_after_down_pressed = self.timer
+
+        if self.left_pressed and not self.right_pressed:
+            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+            self.time_passed_after_left_pressed = self.timer
+
+        if self.right_pressed and not self.left_pressed:
+            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
+            self.time_passed_after_right_pressed = self.timer
+
+        if self.up_pressed and self.down_pressed \
+                and self.time_passed_after_up_pressed < self.time_passed_after_down_pressed:
+            self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
+            print("up and down button pressed! down first")
+
+        if self.down_pressed and self.up_pressed \
+                and self.time_passed_after_up_pressed > self.time_passed_after_down_pressed:
+            self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
+            print("up and down button pressed! up first")
+
+        if self.left_pressed and self.right_pressed \
+                and self.time_passed_after_left_pressed < self.time_passed_after_right_pressed:
+            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+            print("up and down button pressed! right first")
+
+        if self.right_pressed and self.left_pressed \
+                and self.time_passed_after_left_pressed > self.time_passed_after_right_pressed:
+            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
+            print("up and down button pressed! left first")
 
 
 def main():
