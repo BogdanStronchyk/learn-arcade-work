@@ -1,5 +1,8 @@
 """
 Sprite Sample Program
+*********************
+Исправить генерацию алмазиков
+*********************
 """
 
 import arcade
@@ -42,6 +45,8 @@ class MyGame(arcade.Window):
         self.grass_list = None
         self.ceiling_list = None
         self.platform_list = None
+        self.bridge_list = None
+        self.gem_list = None
 
         # Set up the player
         self.player_sprite = None
@@ -51,13 +56,16 @@ class MyGame(arcade.Window):
         self.physics_ceiling = None
         self.physics_grass = None
         self.physics_platform = None
+        self.physics_bridge = None
 
         # Track the current state of what key is pressed
         self.left_pressed = False
         self.right_pressed = False
         self.up_pressed = False
         self.down_pressed = False
+
         self.timer = 0
+
         self.time_passed_after_left_pressed = 0
         self.time_passed_after_right_pressed = 0
         self.time_passed_after_up_pressed = 0
@@ -90,6 +98,8 @@ class MyGame(arcade.Window):
         self.ceiling_list = arcade.SpriteList()
         self.platform_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
+        self.bridge_list = arcade.SpriteList()
+        self.gem_list = arcade.SpriteList()
 
         # Create the player
         self.player_sprite = arcade.Sprite(
@@ -104,38 +114,62 @@ class MyGame(arcade.Window):
         self.physics_ceiling = arcade.PhysicsEngineSimple(self.player_sprite, self.ceiling_list)
         self.physics_grass = arcade.PhysicsEngineSimple(self.player_sprite, self.grass_list)
         self.physics_platform = arcade.PhysicsEngineSimple(self.player_sprite, self.platform_list)
+        self.physics_bridge = arcade.PhysicsEngineSimple(self.player_sprite, self.platform_list)
 
         # Place boxes inside a loop
+
         for y in range(32, SCREEN_HEIGHT_MARGIN, 64):
+            count_gap = 0
             for x in range(32, SCREEN_WIDTH_MARGIN, 64):
-                grass = arcade.Sprite(":resources:images/tiles/grassMid.png", SPRITE_SCALING_BOX)
-                wall = arcade.Sprite(":resources:images/tiles/stoneCenter_rounded.png", SPRITE_SCALING_BOX)
-                ceiling = arcade.Sprite(":resources:images/tiles/bridgeB.png", SPRITE_SCALING_BOX)
-                platform = arcade.Sprite(":resources:images/tiles/grassHalf_mid.png", SPRITE_SCALING_BOX)
 
                 if y == 32 and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
+                    grass = arcade.Sprite(":resources:images/tiles/grassMid.png", SPRITE_SCALING_BOX)
                     grass.center_x = x
                     grass.center_y = y
                     self.grass_list.append(grass)
 
                 if 32 <= y < SCREEN_HEIGHT_MARGIN and x <= 32 or x >= SCREEN_WIDTH_MARGIN - 32:
+                    wall = arcade.Sprite(":resources:images/tiles/stoneCenter_rounded.png", SPRITE_SCALING_BOX)
                     wall.center_x = x
                     wall.center_y = y
                     self.wall_list.append(wall)
 
                 if y == SCREEN_HEIGHT_MARGIN - 32 and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
+                    ceiling = arcade.Sprite(":resources:images/tiles/bridgeB.png", SPRITE_SCALING_BOX)
                     ceiling.center_x = x
                     ceiling.center_y = y
                     self.ceiling_list.append(ceiling)
 
-                if y % 64 == 0 and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
-                    if random.randrange(5) > 0:
+                # Generate gems
+                if y % 64 == 32 and not y % 128 == 32 and 32 < y < SCREEN_HEIGHT_MARGIN - 32 and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
+                    if random.randrange(100) < 5:
+                        gem = arcade.Sprite(":resources:images/items/gemRed.png", SPRITE_SCALING_BOX)
+                        gem.center_x = x
+                        gem.center_y = y
+                        self.gem_list.append(gem)
+
+                if y % 128 == 32 and 32 < y < SCREEN_HEIGHT_MARGIN - 32 and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
+                    if random.randrange(5) > 1:
+                        count_gap = 0
+                        platform = arcade.Sprite(":resources:images/tiles/grassHalf_mid.png", SPRITE_SCALING_BOX)
                         platform.center_x = x
                         platform.center_y = y
-                        self.platform_list.append(wall)
+                        self.platform_list.append(platform)
 
+                    else:
+                        count_gap += 1
+                        if count_gap == 3:
+                            for i in range(count_gap):
+                                bridge = arcade.Sprite(":resources:images/tiles/bridgeA.png", SPRITE_SCALING_BOX)
+                                bridge.center_x = x - 64 * i
+                                bridge.center_y = y
+                                self.ceiling_list.append(bridge)
 
-
+                        elif count_gap > 3:
+                            bridge = arcade.Sprite(":resources:images/tiles/bridgeA.png", SPRITE_SCALING_BOX)
+                            bridge.center_x = x
+                            bridge.center_y = y
+                            self.ceiling_list.append(bridge)
 
     def scroll_to_player(self):
         """Scroll the window to the player."""
@@ -161,6 +195,9 @@ class MyGame(arcade.Window):
         self.ceiling_list.draw()
         self.platform_list.draw()
         self.player_list.draw()
+        self.bridge_list.draw()
+        self.gem_list.draw()
+
         arcade.draw_rectangle_outline(SCREEN_WIDTH_MARGIN / 2, SCREEN_HEIGHT_MARGIN / 2,
                                       SCREEN_WIDTH_MARGIN, SCREEN_HEIGHT_MARGIN, arcade.color.BLACK, 1)
 
@@ -187,16 +224,22 @@ class MyGame(arcade.Window):
         if (not self.sound_player or not self.sound_player.playing) and flag:
             self.sound_player = arcade.play_sound(self.bump_sound)
 
-        # We used to update sprite lists like this:
-        # self.player_list.update()
-        # self.wall_list.update()
-
-        # With the physics engine, we will instead update the sprites by using the physics engine’s update:
-        # It is good to keep all the sprites updated AFTER the logics takes place, which is more logical
+        # Update physical objects:
         self.physics_wall.update()
         self.physics_ceiling.update()
         self.physics_grass.update()
         self.physics_platform.update()
+        self.physics_bridge.update()
+
+        # Update gems
+        self.gem_list.update()
+
+        gem_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.gem_list)
+
+        for gem in gem_hit_list:
+            gem.remove_from_sprite_lists()
+            self.score += 1
+
         # Scroll the screen to the player
         self.scroll_to_player()
 
