@@ -210,6 +210,7 @@ class MyGame(arcade.Window):
             self.player_sprite.change_x = 0
             self.time_passed_after_right_pressed = 0
 
+    # Вот эти две, Влад
     def control(self):
         """Control your character"""
 
@@ -237,22 +238,17 @@ class MyGame(arcade.Window):
         if self.up_pressed and self.down_pressed \
                 and self.time_passed_after_up_pressed < self.time_passed_after_down_pressed:
             self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
-            print("up and down button pressed! down first")
 
         if self.down_pressed and self.up_pressed \
                 and self.time_passed_after_up_pressed > self.time_passed_after_down_pressed:
             self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
-            print("up and down button pressed! up first")
 
         if self.left_pressed and self.right_pressed \
                 and self.time_passed_after_left_pressed < self.time_passed_after_right_pressed:
             self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
-            print("up and down button pressed! right first")
-
         if self.right_pressed and self.left_pressed \
                 and self.time_passed_after_left_pressed > self.time_passed_after_right_pressed:
             self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
-            print("up and down button pressed! left first")
 
         self.player_sprite.center_x += self.player_sprite.change_x
         self.player_sprite.center_y += self.player_sprite.change_y
