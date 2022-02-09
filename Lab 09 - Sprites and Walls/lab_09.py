@@ -210,7 +210,6 @@ class MyGame(arcade.Window):
             self.player_sprite.change_x = 0
             self.time_passed_after_right_pressed = 0
 
-    # Вот эти две, Влад
     def control(self):
         """Control your character"""
 
