@@ -1,8 +1,5 @@
 """
 Sprite Sample Program
-*********************
-Исправить генерацию алмазиков
-*********************
 """
 
 import arcade
@@ -18,12 +15,44 @@ SCREEN_HEIGHT = 600
 SCREEN_WIDTH_MARGIN = SCREEN_WIDTH * 4
 SCREEN_HEIGHT_MARGIN = SCREEN_HEIGHT * 4 - 32
 
+# Index of textures, first element faces left, second faces right
+TEXTURE_LEFT = 0
+TEXTURE_RIGHT = 1
 
-PLAYER_MOVEMENT_SPEED = 2
+PLAYER_MOVEMENT_SPEED = 5
 
 CAMERA_SPEED = 0.2
 
 # --- Variables ---
+a = True
+
+
+class Player(arcade.Sprite):
+
+    def __init__(self):
+        super().__init__()
+
+        self.scale = SPRITE_SCALING_PLAYER
+        self.textures = []
+
+        # Load a left facing texture and a right facing texture.
+        # flipped_horizontally=True will mirror the image we load.
+        texture = arcade.load_texture(":resources:images/animated_characters/male_adventurer/maleAdventurer_idle.png")
+        self.textures.append(texture)
+        texture = arcade.load_texture(":resources:images/animated_characters/male_adventurer/maleAdventurer_idle.png",
+                                      flipped_horizontally=True)
+        self.textures.append(texture)
+
+        # By default, face right.
+        self.texture = texture
+
+    def update(self):
+
+        # Figure out if we should face left or right
+        if self.change_x < 0:
+            self.texture = self.textures[TEXTURE_LEFT]
+        elif self.change_x > 0:
+            self.texture = self.textures[TEXTURE_RIGHT]
 
 
 class MyGame(arcade.Window):
@@ -38,25 +67,19 @@ class MyGame(arcade.Window):
 
         self.bump_sound = arcade.load_sound(":resources:sounds/error4.wav")
         self.sound_player = None
+        self.gem_collected = arcade.load_sound(":resources:sounds/coin5.wav")
+        self.stone_hit = arcade.load_sound(":resources:sounds/rockHit2.wav")
 
         # Sprite lists
         self.player_list = None
         self.wall_list = None
-        self.grass_list = None
-        self.ceiling_list = None
-        self.platform_list = None
-        self.bridge_list = None
         self.gem_list = None
 
         # Set up the player
         self.player_sprite = None
 
         # This variable holds our simple "physics engine"
-        self.physics_wall = None
-        self.physics_ceiling = None
-        self.physics_grass = None
-        self.physics_platform = None
-        self.physics_bridge = None
+        self.physics_engine = None
 
         # Track the current state of what key is pressed
         self.left_pressed = False
@@ -94,82 +117,78 @@ class MyGame(arcade.Window):
 
         # Sprite lists
         self.player_list = arcade.SpriteList()
-        self.grass_list = arcade.SpriteList()
-        self.ceiling_list = arcade.SpriteList()
-        self.platform_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
-        self.bridge_list = arcade.SpriteList()
         self.gem_list = arcade.SpriteList()
 
         # Create the player
-        self.player_sprite = arcade.Sprite(
-            ":resources:images/animated_characters/male_adventurer/maleAdventurer_idle.png", SPRITE_SCALING_PLAYER)
+        self.player_sprite = Player()
         self.player_sprite.center_x = 128
         self.player_sprite.center_y = 128
         self.player_list.append(self.player_sprite)
 
         # This identifies the player character
         # and a lists of sprites that the player character isn’t allowed to pass through.
-        self.physics_wall = arcade.PhysicsEngineSimple(self.player_sprite, self.wall_list)
-        self.physics_ceiling = arcade.PhysicsEngineSimple(self.player_sprite, self.ceiling_list)
-        self.physics_grass = arcade.PhysicsEngineSimple(self.player_sprite, self.grass_list)
-        self.physics_platform = arcade.PhysicsEngineSimple(self.player_sprite, self.platform_list)
-        self.physics_bridge = arcade.PhysicsEngineSimple(self.player_sprite, self.platform_list)
+        self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.wall_list)
 
-        # Place boxes inside a loop
-
+        # Place all sprite generation inside a loop
         for y in range(32, SCREEN_HEIGHT_MARGIN, 64):
             count_gap = 0
             for x in range(32, SCREEN_WIDTH_MARGIN, 64):
 
+                # generate grass floor
                 if y == 32 and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
                     grass = arcade.Sprite(":resources:images/tiles/grassMid.png", SPRITE_SCALING_BOX)
                     grass.center_x = x
                     grass.center_y = y
-                    self.grass_list.append(grass)
+                    self.wall_list.append(grass)
 
+                # generate walls
                 if 32 <= y < SCREEN_HEIGHT_MARGIN and x <= 32 or x >= SCREEN_WIDTH_MARGIN - 32:
                     wall = arcade.Sprite(":resources:images/tiles/stoneCenter_rounded.png", SPRITE_SCALING_BOX)
                     wall.center_x = x
                     wall.center_y = y
                     self.wall_list.append(wall)
 
+                # generate ceiling tile
                 if y == SCREEN_HEIGHT_MARGIN - 32 and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
                     ceiling = arcade.Sprite(":resources:images/tiles/bridgeB.png", SPRITE_SCALING_BOX)
                     ceiling.center_x = x
                     ceiling.center_y = y
-                    self.ceiling_list.append(ceiling)
+                    self.wall_list.append(ceiling)
 
                 # Generate gems
-                if y % 64 == 32 and not y % 128 == 32 and 32 < y < SCREEN_HEIGHT_MARGIN - 32 and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
+                if y % 64 == 32 and not y % 128 == 32 and 32 < y < SCREEN_HEIGHT_MARGIN - 32 \
+                        and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
                     if random.randrange(100) < 5:
                         gem = arcade.Sprite(":resources:images/items/gemRed.png", SPRITE_SCALING_BOX)
                         gem.center_x = x
                         gem.center_y = y
                         self.gem_list.append(gem)
 
+                # generate platforms
                 if y % 128 == 32 and 32 < y < SCREEN_HEIGHT_MARGIN - 32 and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
                     if random.randrange(5) > 1:
                         count_gap = 0
                         platform = arcade.Sprite(":resources:images/tiles/grassHalf_mid.png", SPRITE_SCALING_BOX)
                         platform.center_x = x
                         platform.center_y = y
-                        self.platform_list.append(platform)
+                        self.wall_list.append(platform)
 
+                    # if the gap is 2 or more tiles wide, generate bridges to connect separate platforms
                     else:
                         count_gap += 1
-                        if count_gap == 3:
+                        if count_gap == 2:
                             for i in range(count_gap):
                                 bridge = arcade.Sprite(":resources:images/tiles/bridgeA.png", SPRITE_SCALING_BOX)
                                 bridge.center_x = x - 64 * i
                                 bridge.center_y = y
-                                self.ceiling_list.append(bridge)
+                                self.wall_list.append(bridge)
 
-                        elif count_gap > 3:
+                        elif count_gap > 2:
                             bridge = arcade.Sprite(":resources:images/tiles/bridgeA.png", SPRITE_SCALING_BOX)
                             bridge.center_x = x
                             bridge.center_y = y
-                            self.ceiling_list.append(bridge)
+                            self.wall_list.append(bridge)
 
     def scroll_to_player(self):
         """Scroll the window to the player."""
@@ -191,11 +210,7 @@ class MyGame(arcade.Window):
 
         # Draw the sprites
         self.wall_list.draw()
-        self.grass_list.draw()
-        self.ceiling_list.draw()
-        self.platform_list.draw()
         self.player_list.draw()
-        self.bridge_list.draw()
         self.gem_list.draw()
 
         arcade.draw_rectangle_outline(SCREEN_WIDTH_MARGIN / 2, SCREEN_HEIGHT_MARGIN / 2,
@@ -216,6 +231,7 @@ class MyGame(arcade.Window):
 
         # move character:
         self.control()
+        self.player_sprite.update()
 
         # See if the player hit the edge of the screen
         flag = self.check_screen_collision()
@@ -225,11 +241,7 @@ class MyGame(arcade.Window):
             self.sound_player = arcade.play_sound(self.bump_sound)
 
         # Update physical objects:
-        self.physics_wall.update()
-        self.physics_ceiling.update()
-        self.physics_grass.update()
-        self.physics_platform.update()
-        self.physics_bridge.update()
+        self.physics_engine.update()
 
         # Update gems
         self.gem_list.update()
@@ -237,10 +249,10 @@ class MyGame(arcade.Window):
         gem_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.gem_list)
 
         for gem in gem_hit_list:
+            arcade.play_sound(self.gem_collected)
             gem.remove_from_sprite_lists()
             self.score += 1
 
-        # Scroll the screen to the player
         self.scroll_to_player()
 
     def on_key_press(self, key, modifiers):
