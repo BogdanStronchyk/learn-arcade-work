@@ -263,7 +263,6 @@ class MyGame(arcade.Window):
         self.player_list.draw()
         self.gem_list.draw()
 
-
         # Select the (unscrolled) camera for our GUI
         self.camera_for_gui.use()
         arcade.draw_text(f"Score: {self.score}", 10, 10, arcade.color.WHITE, 24)
