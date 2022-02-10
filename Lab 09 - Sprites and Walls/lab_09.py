@@ -119,6 +119,9 @@ class MyGame(arcade.Window):
         self.wall_list = None
         self.gem_list = None
 
+        # Background image
+        self.background_image = None
+
         # Set up the player
         self.player_sprite = None
 
@@ -157,7 +160,7 @@ class MyGame(arcade.Window):
     def setup(self):
 
         # Set the background color
-        arcade.set_background_color(arcade.color.AMAZON)
+        self.background_image = arcade.load_texture(":resources:images/backgrounds/abstract_1.jpg")
 
         # Sprite lists
         self.player_list = arcade.SpriteList()
@@ -249,6 +252,9 @@ class MyGame(arcade.Window):
     def on_draw(self):
         self.clear()
 
+        # Set background image
+        arcade.draw_lrwh_rectangle_textured(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.background_image)
+
         # Select the scrolled camera for our sprites
         self.camera_for_sprites.use()
 
@@ -257,8 +263,6 @@ class MyGame(arcade.Window):
         self.player_list.draw()
         self.gem_list.draw()
 
-        arcade.draw_rectangle_outline(SCREEN_WIDTH_MARGIN / 2, SCREEN_HEIGHT_MARGIN / 2,
-                                      SCREEN_WIDTH_MARGIN, SCREEN_HEIGHT_MARGIN, arcade.color.BLACK, 1)
 
         # Select the (unscrolled) camera for our GUI
         self.camera_for_gui.use()
