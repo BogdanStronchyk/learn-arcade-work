@@ -19,12 +19,26 @@ SCREEN_HEIGHT_MARGIN = SCREEN_HEIGHT * 4 - 32
 TEXTURE_LEFT = 0
 TEXTURE_RIGHT = 1
 
+# How fast to move, and how fast to run the animation
 PLAYER_MOVEMENT_SPEED = 5
+UPDATES_PER_FRAME = 5
+
+# Constants used to track if the player is facing left or right
+RIGHT_FACING = 0
+LEFT_FACING = 1
 
 CAMERA_SPEED = 0.2
-
 # --- Variables ---
-a = True
+
+
+def load_texture_pair(filename):
+    """
+    Load a texture pair, with the second being a mirror image.
+    """
+    return [
+        arcade.load_texture(filename),
+        arcade.load_texture(filename, flipped_horizontally=True)
+    ]
 
 
 class Player(arcade.Sprite):
@@ -32,27 +46,57 @@ class Player(arcade.Sprite):
     def __init__(self):
         super().__init__()
 
+        # Default to face-right
+        self.character_face_direction = RIGHT_FACING
+
+        # Used for flipping between image sequences
+        self.cur_texture = 0
+
         self.scale = SPRITE_SCALING_PLAYER
-        self.textures = []
 
-        # Load a left facing texture and a right facing texture.
-        # flipped_horizontally=True will mirror the image we load.
-        texture = arcade.load_texture(":resources:images/animated_characters/male_adventurer/maleAdventurer_idle.png")
-        self.textures.append(texture)
-        texture = arcade.load_texture(":resources:images/animated_characters/male_adventurer/maleAdventurer_idle.png",
-                                      flipped_horizontally=True)
-        self.textures.append(texture)
+        # Adjust the collision box. Default includes too much empty space
+        # side-to-side. Box is centered at sprite center, (0, 0)
+        self.points = [[-22, -64], [22, -64], [22, 28], [-22, 28]]
 
-        # By default, face right.
-        self.texture = texture
+        # --- Load Textures ---
 
-    def update(self):
+        # Images from Kenney.nl's Asset Pack 3
+        # main_path = ":resources:images/animated_characters/female_adventurer/femaleAdventurer"
+        # main_path = ":resources:images/animated_characters/female_person/femalePerson"
+        # main_path = ":resources:images/animated_characters/male_person/malePerson"
+        main_path = ":resources:images/animated_characters/male_adventurer/maleAdventurer"
+        # main_path = ":resources:images/animated_characters/zombie/zombie"
+        # main_path = ":resources:images/animated_characters/robot/robot"
 
-        # Figure out if we should face left or right
-        if self.change_x < 0:
-            self.texture = self.textures[TEXTURE_LEFT]
-        elif self.change_x > 0:
-            self.texture = self.textures[TEXTURE_RIGHT]
+        # Load textures for idle standing
+        self.idle_texture_pair = load_texture_pair(f"{main_path}_idle.png")
+
+        # Load textures for walking
+        self.walk_textures = []
+        for i in range(8):
+            texture = load_texture_pair(f"{main_path}_walk{i}.png")
+            self.walk_textures.append(texture)
+
+    def update_animation(self, delta_time: float = 1 / 60):
+
+        # Figure out if we need to flip face left or right
+        if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
+            self.character_face_direction = LEFT_FACING
+        elif self.change_x > 0 and self.character_face_direction == LEFT_FACING:
+            self.character_face_direction = RIGHT_FACING
+
+        # Idle animation
+        if self.change_x == 0 and self.change_y == 0:
+            self.texture = self.idle_texture_pair[self.character_face_direction]
+            return
+
+        # Walking animation
+        self.cur_texture += 1
+        if self.cur_texture > 7 * UPDATES_PER_FRAME:
+            self.cur_texture = 0
+        frame = self.cur_texture // UPDATES_PER_FRAME
+        direction = self.character_face_direction
+        self.texture = self.walk_textures[frame][direction]
 
 
 class MyGame(arcade.Window):
@@ -231,7 +275,7 @@ class MyGame(arcade.Window):
 
         # move character:
         self.control()
-        self.player_sprite.update()
+        self.player_list.update_animation()
 
         # See if the player hit the edge of the screen
         flag = self.check_screen_collision()
@@ -329,8 +373,8 @@ class MyGame(arcade.Window):
                 and self.time_passed_after_left_pressed > self.time_passed_after_right_pressed:
             self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
-        self.player_sprite.center_x += self.player_sprite.change_x
-        self.player_sprite.center_y += self.player_sprite.change_y
+            self.player_sprite.center_x += self.player_sprite.change_x
+            self.player_sprite.center_x += self.player_sprite.change_y
 
     def check_screen_collision(self):
         """
