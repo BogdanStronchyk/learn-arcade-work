@@ -203,7 +203,7 @@ class MyGame(arcade.Window):
                 # Generate gems
                 if y % 64 == 32 and not y % 128 == 32 and 32 < y < SCREEN_HEIGHT_MARGIN - 32 \
                         and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
-                    if random.randrange(100) < 5:
+                    if random.randint(1, 100) < 5:
                         gem = arcade.Sprite(":resources:images/items/gemRed.png", SPRITE_SCALING_BOX)
                         gem.center_x = x
                         gem.center_y = y
@@ -211,7 +211,7 @@ class MyGame(arcade.Window):
 
                 # generate platforms
                 if y % 128 == 32 and 32 < y < SCREEN_HEIGHT_MARGIN - 32 and 32 < x <= SCREEN_WIDTH_MARGIN - 64:
-                    if random.randrange(5) > 1:
+                    if random.randint(1, 5) > 2:
                         count_gap = 0
                         platform = arcade.Sprite(":resources:images/tiles/grassHalf_mid.png", SPRITE_SCALING_BOX)
                         platform.center_x = x
