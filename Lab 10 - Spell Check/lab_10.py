@@ -65,7 +65,8 @@ def main():
 
     print(f'\nLinear search has been running for {t2 - t1:.2f} seconds. Trials made: {iters}.')
     print(f'Binary search has been running for {t4 - t3:.5f} seconds. Trials made: {iters1}.')
-    print(f'Binary made {iters/iters1:.2f} times less trials and was {(t2 - t1)/(t4 - t3):.2f} times more quick.')
+    print(f'Binary made {iters/iters1:.2f} times less trials and was {(t2 - t1)/(t4 - t3):.2f} times more quick')
+    print('for this data set.')
 
 
 if __name__ == '__main__':
